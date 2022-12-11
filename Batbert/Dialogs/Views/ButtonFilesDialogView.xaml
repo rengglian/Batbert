@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="Batbert.Dialogs.Views.ButtonFilesDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Batbert.Dialogs.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Target Folder" Grid.Row="0" Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ChoosenFolder}" />
+                <Button Grid.Row="0" Grid.Column="1" Content="Choose Files" Command="{Binding ChooseFilesCommand}"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Files" Grid.Row="1" Grid.Column="0">
+            <ListView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding FileList}" 
+                      BorderThickness="0"
+                      ScrollViewer.VerticalScrollBarVisibility="auto">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </GroupBox>
+        <Grid Grid.Row="2" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Grid.Column="0" Command="{Binding CloseCommand}" CommandParameter="false" Content="Cancel" Width="100" IsDefault="True" />
+            <Button Grid.Row="0" Grid.Column="1" Command="{Binding CloseCommand}" CommandParameter="true" Content="Confirm" Width="100" IsDefault="False" />
+        </Grid>
+
+    </Grid>
+</UserControl>
