@@ -35,6 +35,7 @@ namespace Batbert.Dialogs.ViewModels
         }
 
         public DelegateCommand ChooseFilesCommand { get; private set; }
+        public DelegateCommand ResetFilesCommand { get; private set; }
         public DelegateCommand<string> CloseCommand { get; private set; }
 
         public event Action<IDialogResult> RequestClose;
@@ -45,6 +46,7 @@ namespace Batbert.Dialogs.ViewModels
             _logger = logger;
 
             ChooseFilesCommand = new DelegateCommand(ChooseFilesCommandHandler);
+            ResetFilesCommand = new DelegateCommand(ResetFilesCommandHanlder);
             CloseCommand = new DelegateCommand<string>(CloseCommandHandler);
         }
 
@@ -75,7 +77,7 @@ namespace Batbert.Dialogs.ViewModels
 
             if (parameter.Equals("true"))
             {
-                p = new DialogParameters { { "fileList", _addMp3FilesService.SelectedFileNames } };
+                p = new DialogParameters { { "fileList", FileList } };
                 RaiseRequestClose(new DialogResult(ButtonResult.OK, p));
 
             }
@@ -90,13 +92,21 @@ namespace Batbert.Dialogs.ViewModels
             try
             {
                 _addMp3FilesService.AddFiles();
-                FileList = _addMp3FilesService.SelectedFileNames.ToList();
+                var tmpList = new List<string>();
+                tmpList.AddRange(FileList);
+                tmpList.AddRange(_addMp3FilesService.SelectedFileNames.ToList());
+                FileList = tmpList;
                 ChoosenFolder = _addMp3FilesService.Folder;
             }
             catch (InvalidOperationException e)
             {
                 FileList.Add(e.Message);
             }
+        }
+        private void ResetFilesCommandHanlder()
+        {
+            FileList = new List<string>();
+            ChoosenFolder = "";
         }
     }
 }

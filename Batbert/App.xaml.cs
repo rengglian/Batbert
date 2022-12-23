@@ -8,7 +8,6 @@ using Batbert.Dialogs.Views;
 using Batbert.Dialogs.ViewModels;
 using NLog.Config;
 using NLog.Filters;
-using NLog.Layouts;
 using NLog.Targets;
 using NLog;
 using DryIoc;
@@ -54,7 +53,7 @@ namespace Batbert
         {
             LoggingConfiguration config = new();
 
-            FileTarget fileTargetTraceLog = new FileTarget
+            FileTarget fileTargetTraceLog = new()
             {
                 FileName = @"${basedir}trace.log",
                 Layout = "${longdate}|${level:uppercase=true}|${threadname:whenEmpty=${threadid}}|${message:withexception=true}",
@@ -66,9 +65,10 @@ namespace Batbert
 
             config.AddTarget("tracelogfile", fileTargetTraceLog);
 
-            LoggingRule ruleTrace = new("*", LogLevel.Trace, fileTargetTraceLog);
-
-            ruleTrace.FilterDefaultAction = FilterResult.Log;
+            LoggingRule ruleTrace = new("*", LogLevel.Trace, fileTargetTraceLog)
+            {
+                FilterDefaultAction = FilterResult.Log
+            };
 
             config.LoggingRules.Add(ruleTrace);
 

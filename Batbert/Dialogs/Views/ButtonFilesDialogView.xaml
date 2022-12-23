@@ -22,12 +22,14 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ChoosenFolder}" />
                 <Button Grid.Row="0" Grid.Column="1" Content="Choose Files" Command="{Binding ChooseFilesCommand}"/>
+                <Button Grid.Row="0" Grid.Column="2" Content="Reset List" Command="{Binding ResetFilesCommand}"/>
             </Grid>
         </GroupBox>
 

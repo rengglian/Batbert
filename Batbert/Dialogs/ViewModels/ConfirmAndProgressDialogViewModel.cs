@@ -7,14 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
+using System.Threading.Tasks;
 
 namespace Batbert.Dialogs.ViewModels
 {
     public class ConfirmAndProgressDialogViewModel : BindableBase, IDialogAware
     {
         private readonly ILogger<ConfirmAndProgressDialogViewModel> _logger;
-        private List<BatButton> _buttonList = new List<BatButton>();
+        private List<BatButton> _buttonList = new();
 
         private string _destinationPath = "";
         private string _destinationFile = "";
@@ -101,13 +101,20 @@ namespace Batbert.Dialogs.ViewModels
 
         private void ConfirmAndStartCommandHandler()
         {
-            foreach(BatButton button in _buttonList)
+            Task.Factory.StartNew(() =>
+            {
+                DoWork();
+            });
+        }
+        private void DoWork()
+        {
+            foreach (BatButton button in _buttonList)
             {
                 int fileNumber = 1;
                 string pathString = Path.Combine(DestinationPath, button.SubFolderName);
                 _logger.Information($"Create Folder {pathString}");
                 Directory.CreateDirectory(pathString);
-                foreach(string fileName in button.GetFileList())
+                foreach (string fileName in button.GetFileList())
                 {
                     ActualFile = fileName;
                     string targetFileName = button.SubFolderName.Contains("mp3") ? $"{fileNumber:D4}.mp3" : $"{fileNumber:D3}.mp3";
