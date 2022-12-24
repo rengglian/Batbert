@@ -7,7 +7,14 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
-             Height="450" Width="800">
+             Height="500" Width="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Batbert;component/Resources/ButtonStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -28,8 +35,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ChoosenFolder}" />
-                <Button Grid.Row="0" Grid.Column="1" Content="Choose Files" Command="{Binding ChooseFilesCommand}"/>
-                <Button Grid.Row="0" Grid.Column="2" Content="Reset List" Command="{Binding ResetFilesCommand}"/>
+                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Content="Choose Files" Command="{Binding ChooseFilesCommand}"/>
+                <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource DefaultButton}" Content="Reset List" Command="{Binding ResetFilesCommand}"/>
             </Grid>
         </GroupBox>
 
@@ -52,8 +59,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" Grid.Column="0" Command="{Binding CloseCommand}" CommandParameter="false" Content="Cancel" Width="100" IsDefault="True" />
-            <Button Grid.Row="0" Grid.Column="1" Command="{Binding CloseCommand}" CommandParameter="true" Content="Confirm" Width="100" IsDefault="False" />
+            <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultButton}" Command="{Binding CloseCommand}" CommandParameter="false" Content="Cancel" Width="100" IsDefault="True" />
+            <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Command="{Binding CloseCommand}" CommandParameter="true" Content="Confirm" Width="100" IsDefault="False" />
         </Grid>
 
     </Grid>

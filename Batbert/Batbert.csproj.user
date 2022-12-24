@@ -23,6 +23,9 @@
     <Page Update="Dialogs\Views\ConfirmAndProgressDialogView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Resources\ButtonStyles.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
