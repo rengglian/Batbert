@@ -7,6 +7,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Batbert;component/Resources/GlobalColorDictionary.xaml" />
+                <ResourceDictionary Source="/Batbert;component/Resources/DialogWindowStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
