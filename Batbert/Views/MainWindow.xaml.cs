@@ -1,4 +1,5 @@
 ﻿using Batbert.Interfaces;
+using System;
 using System.Windows;
 
 namespace Batbert.Views
@@ -13,6 +14,7 @@ namespace Batbert.Views
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
+            MouseLeftButtonDown += MainWindow_MouseLeftButtonDown;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -24,6 +26,11 @@ namespace Batbert.Views
                     Close();
                 };
             }
+        }
+
+        private void MainWindow_MouseLeftButtonDown(object sender, EventArgs e)
+        {
+            DragMove();
         }
     }
 }
