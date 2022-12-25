@@ -11,7 +11,7 @@ using Batbert.Extensions;
 
 namespace Batbert.ViewModels
 {
-    public class MainWindowViewModel : BindableBase
+    public class MainWindowViewModel : BindableBase, ICloseWindows
     {
         private readonly IChooseDestinationFolderService _chooseDestinationFolderService;
         private readonly IDialogService _dialogService;
@@ -39,6 +39,8 @@ namespace Batbert.ViewModels
 
         public DelegateCommand ChooseFolderCommand { get; private set; }
         public DelegateCommand WriteDataCommand { get; private set; }
+        public DelegateCommand CloseCommand { get; private set; }
+        public Action CloseWindow { get; set; }
 
         public MainWindowViewModel(IChooseDestinationFolderService chooseDestinationFolderService, IDialogService dialogService)
         {
@@ -63,6 +65,8 @@ namespace Batbert.ViewModels
   
             ChooseFolderCommand = new DelegateCommand(ChooseFolderCommandHandler);
             WriteDataCommand = new DelegateCommand(WriteDataCommandHandler);
+            CloseCommand = new DelegateCommand(CloseCommandHandler);
+
         }
 
         private void ChooseFolderCommandHandler()
@@ -86,6 +90,11 @@ namespace Batbert.ViewModels
                 {
                 }
             });
+        }
+
+        private void CloseCommandHandler()
+        {
+            CloseWindow?.Invoke();
         }
     }
 }

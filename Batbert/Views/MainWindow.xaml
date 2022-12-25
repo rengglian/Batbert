@@ -8,6 +8,7 @@
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
+        WindowStyle="None"
         Background="{StaticResource Batbert.Views.Background}"
         Title="{Binding Title}" Height="600" Width="800">
     <Window.Resources>
@@ -24,7 +25,6 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
@@ -33,7 +33,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultGroupBox}" Header="Target Folder">
+        <GroupBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource DefaultGroupBox}" Header="Target Folder">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -46,7 +46,7 @@
                 <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Content="Choose Folder" Command="{Binding ChooseFolderCommand}"/>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="1" Style="{StaticResource DefaultGroupBox}" Header="Buttons">
+        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource DefaultGroupBox}" Header="Buttons">
             <ItemsControl Name="calibTable" BorderThickness="0" ItemsSource="{Binding BatButtons}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -75,7 +75,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </GroupBox>
-        <GroupBox Grid.Row="2" Grid.Column="1" Style="{StaticResource DefaultGroupBox}" Header="Write Data">
+        <GroupBox Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Write Data">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -85,6 +85,17 @@
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Content="Write" Command="{Binding WriteDataCommand}"/>
             </Grid>
-        </GroupBox>        
+        </GroupBox>
+        <GroupBox Grid.Row="2" Grid.Column="1" Style="{StaticResource DefaultGroupBox}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Content="Close" Command="{Binding CloseCommand}"/>
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>

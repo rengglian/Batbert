@@ -7,8 +7,17 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
-             Background="{StaticResource Batbert.Views.Background}"
-             Height="500" Width="800">
+             Background="{StaticResource Batbert.Views.Background}">
+    
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="WindowStyle" Value="None"/>
+            <Setter Property="Height" Value="500"/>
+            <Setter Property="Width" Value="800"/>
+        </Style>
+    </prism:Dialog.WindowStyle>
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
