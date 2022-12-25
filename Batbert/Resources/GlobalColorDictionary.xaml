@@ -1,0 +1,9 @@
+﻿<ResourceDictionary x:Class="Batbert.Resources.GlobalColorDictionary"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="Batbert.Views.Background" Color="AliceBlue" />
+    <SolidColorBrush x:Key="Batbert.Views.GroupBox.Background" Color="LightBlue" />
+    <SolidColorBrush x:Key="Batbert.Views.GroupBox.ButtonBackground" Color="AliceBlue" Opacity="0.5"/>
+        
+</ResourceDictionary>

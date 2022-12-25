@@ -7,10 +7,12 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
+             Background="{StaticResource Batbert.Views.Background}"
              Height="500" Width="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Batbert;component/Resources/GroupBoxStyles.xaml" />
                 <ResourceDictionary Source="/Batbert;component/Resources/ButtonStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -25,10 +27,10 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Destination" Grid.Row="0" Grid.Column="0">
+        <GroupBox Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Destination">
             <TextBlock Text="{Binding DestinationPath}"/>
         </GroupBox>
-        <GroupBox Header="Information" Grid.Row="1" Grid.Column="0">
+        <GroupBox Grid.Row="1" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Information">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -50,7 +52,7 @@
                 <ProgressBar Grid.Row="2" Grid.Column="0" Value="{Binding ActualFileNumber}" Minimum="0" Maximum="{Binding TotalFiles}"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Confirm and Start" Grid.Row="2" Grid.Column="0">
+        <GroupBox Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Confirm and Start">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

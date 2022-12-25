@@ -4,15 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Batbert"
+        xmlns:converters="clr-namespace:Batbert.Converters"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="500" Width="800">
+        Background="{StaticResource Batbert.Views.Background}"
+        Title="{Binding Title}" Height="600" Width="800">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Batbert;component/Resources/GlobalColorDictionary.xaml" />
                 <ResourceDictionary Source="/Batbert;component/Resources/ButtonStyles.xaml" />
+                <ResourceDictionary Source="/Batbert;component/Resources/GroupBoxStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:RandomColorConverter x:Key="RandomColorConverter"/>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -27,7 +33,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Target Folder" Grid.Row="0" Grid.Column="1">
+        <GroupBox Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultGroupBox}" Header="Target Folder">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -40,7 +46,7 @@
                 <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Content="Choose Folder" Command="{Binding ChooseFolderCommand}"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Buttons" Grid.Row="1" Grid.Column="1">
+        <GroupBox Grid.Row="1" Grid.Column="1" Style="{StaticResource DefaultGroupBox}" Header="Buttons">
             <ItemsControl Name="calibTable" BorderThickness="0" ItemsSource="{Binding BatButtons}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -49,7 +55,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <GroupBox Header="{Binding SubFolderName}" >
+                        <GroupBox Style="{StaticResource ButtonGroupBox}" Background="{Binding SubFolderName, Converter={StaticResource RandomColorConverter}}" Header="{Binding SubFolderName}" >
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>
@@ -69,7 +75,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </GroupBox>
-        <GroupBox Header="Write Data" Grid.Row="2" Grid.Column="1">
+        <GroupBox Grid.Row="2" Grid.Column="1" Style="{StaticResource DefaultGroupBox}" Header="Write Data">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

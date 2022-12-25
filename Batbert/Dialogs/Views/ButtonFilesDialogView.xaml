@@ -6,11 +6,13 @@
              xmlns:local="clr-namespace:Batbert.Dialogs.Views"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
+             Background="{StaticResource Batbert.Views.Background}"
              Height="500" Width="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Batbert;component/Resources/GroupBoxStyles.xaml" />
                 <ResourceDictionary Source="/Batbert;component/Resources/ButtonStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -24,7 +26,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Target Folder" Grid.Row="0" Grid.Column="0">
+        <GroupBox Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Target Folder">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -40,7 +42,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Header="Files" Grid.Row="1" Grid.Column="0">
+        <GroupBox Grid.Row="1" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Files">
             <ListView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding FileList}" 
                       BorderThickness="0"
                       ScrollViewer.VerticalScrollBarVisibility="auto">
@@ -51,17 +53,20 @@
                 </ListView.ItemTemplate>
             </ListView>
         </GroupBox>
-        <Grid Grid.Row="2" Grid.Column="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultButton}" Command="{Binding CloseCommand}" CommandParameter="false" Content="Cancel" Width="100" IsDefault="True" />
-            <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Command="{Binding CloseCommand}" CommandParameter="true" Content="Confirm" Width="100" IsDefault="False" />
-        </Grid>
+        <GroupBox Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultGroupBox}">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultButton}" Command="{Binding CloseCommand}" CommandParameter="false" Content="Cancel" Width="100" IsDefault="True" />
+                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Command="{Binding CloseCommand}" CommandParameter="true" Content="Confirm" Width="100" IsDefault="False" />
+            </Grid>
+        </GroupBox>
+        
 
     </Grid>
 </UserControl>
