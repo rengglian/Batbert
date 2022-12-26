@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Batbert.Dialogs.ViewModels
@@ -77,7 +78,7 @@ namespace Batbert.Dialogs.ViewModels
         {
             DestinationPath = parameters.GetValue<string>("destination");
             _buttonList = parameters.GetValue<IEnumerable<BatButton>>("buttonList").ToList();
-            TotalFiles = _buttonList.Sum(button => button.FileCount);
+            TotalFiles = _buttonList.Sum(button => button.ButtonContentCount);
         }
 
         public virtual void RaiseRequestClose(IDialogResult dialogResult)
@@ -99,12 +100,10 @@ namespace Batbert.Dialogs.ViewModels
             }
         }
 
-        private void ConfirmAndStartCommandHandler()
+        private async void ConfirmAndStartCommandHandler()
         {
-            Task.Factory.StartNew(() =>
-            {
-                DoWork();
-            });
+            await Task.Run(() => DoWork());
+            CloseCommandHandler("true");
         }
         private void DoWork()
         {
@@ -113,19 +112,18 @@ namespace Batbert.Dialogs.ViewModels
                 int fileNumber = 1;
                 string pathString = Path.Combine(DestinationPath, button.SubFolderName);
                 _logger.Information($"Create Folder {pathString}");
-                Directory.CreateDirectory(pathString);
-                foreach (string fileName in button.GetFileList())
+                //Directory.CreateDirectory(pathString);
+                foreach (IButtonContent buttonContent in button.GetButtonContentList())
                 {
-                    ActualFile = fileName;
+                    ActualFile = buttonContent.FileName;
                     string targetFileName = button.SubFolderName.Contains("mp3") ? $"{fileNumber:D4}.mp3" : $"{fileNumber:D3}.mp3";
                     fileNumber++;
                     string destFile = Path.Combine(pathString, targetFileName);
-                    _logger.Information($"Copy File {fileName} to {destFile}");
-                    File.Copy(fileName, destFile, true);
+                    _logger.Information($"Copy File {buttonContent.FileName} to {destFile}");
+                    //File.Copy(buttonContent.FileName, destFile, true);
                     ActualFileNumber++;
                 }
             }
-            CloseCommandHandler("true");
         }
     }
 }

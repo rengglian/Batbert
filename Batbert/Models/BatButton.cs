@@ -1,4 +1,5 @@
 ﻿using Batbert.Extensions;
+using Batbert.Interfaces;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -11,15 +12,15 @@ namespace Batbert.Models
     {
         private readonly IDialogService _dialogService;
 
-        private int _fileCount = 0;
+        private int _buttonContentCount = 0;
         public string SubFolderName { get; } = "";
-        public int FileCount
+        public int ButtonContentCount
         {
-            get => _fileCount;
-            set => SetProperty(ref _fileCount, value);
+            get => _buttonContentCount;
+            set => SetProperty(ref _buttonContentCount, value);
         }
 
-        private List<string> FileList = new();
+        private List<IButtonContent> ButtonContentList = new();
 
         public DelegateCommand AddFolderCommand { get; private set; }
 
@@ -32,19 +33,19 @@ namespace Batbert.Models
 
         public void AddFolderHandler()
         {
-            _dialogService.ShowButtonFilesDialog(SubFolderName, FileList, r =>
+            _dialogService.ShowButtonFilesDialog(SubFolderName, ButtonContentList, r =>
             {
                 if (r.Result == ButtonResult.OK)
                 {
-                    FileList = r.Parameters.GetValue<IEnumerable<string>> ("fileList").ToList();
-                    FileCount = FileList.Count;
+                    ButtonContentList = r.Parameters.GetValue<IEnumerable<IButtonContent>> ("buttonContent").ToList();
+                    ButtonContentCount = ButtonContentList.Count;
                 }
             });
         }
 
-        public IEnumerable<string> GetFileList()
+        public IEnumerable<IButtonContent> GetButtonContentList()
         {
-            return FileList;
+            return ButtonContentList;
         }
     }
 }

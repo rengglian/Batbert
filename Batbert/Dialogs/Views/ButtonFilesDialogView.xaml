@@ -44,15 +44,28 @@
         </GroupBox>
 
         <GroupBox Grid.Row="1" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Files">
-            <ListView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding FileList}" 
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <ListView Name="ButtonContentListView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding ButtonContentList}" 
                       BorderThickness="0"
                       ScrollViewer.VerticalScrollBarVisibility="auto">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}"/>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    <ListView.View>
+                        <GridView >
+                            <GridViewColumn Header="File" DisplayMemberBinding="{Binding FileName}"/>
+                            <GridViewColumn Header="Index" DisplayMemberBinding="{Binding Index}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Content="Merge Selected" Command="{Binding MergeCommand}" CommandParameter="{Binding ElementName=ButtonContentListView,Path=SelectedItems}"/>
+            </Grid>
         </GroupBox>
         <GroupBox Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultGroupBox}">
             <Grid >

@@ -1,7 +1,6 @@
 ﻿
 using Batbert.Interfaces;
-using Batbert.Services;
-using NLog;
+using Batbert.Models;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -16,16 +15,18 @@ namespace Batbert.Dialogs.ViewModels
         private readonly IAddMp3FilesService _addMp3FilesService;
         private readonly ILogger<ButtonFilesDialogViewModel> _logger;
 
-        private string buttonName_ = "";
-        private List<string> _fileList = new();
+        private string _buttonName = "";
+        private List<IButtonContent> _buttonContentList = new();
         private string _choosenFolder = "";
 
-        public string Title => $"Button {buttonName_} File List Dialog";
+        private int _index = 0;
 
-        public List<string> FileList
+        public string Title => $"Button {_buttonName} File List Dialog";
+
+        public List<IButtonContent> ButtonContentList
         {
-            get => _fileList;
-            set => SetProperty(ref _fileList, value);
+            get => _buttonContentList;
+            set => SetProperty(ref _buttonContentList, value);
         }
 
         public string ChoosenFolder
@@ -37,6 +38,7 @@ namespace Batbert.Dialogs.ViewModels
         public DelegateCommand ChooseFilesCommand { get; private set; }
         public DelegateCommand ResetFilesCommand { get; private set; }
         public DelegateCommand<string> CloseCommand { get; private set; }
+        public DelegateCommand<object> MergeCommand { get; private set; }
 
         public event Action<IDialogResult> RequestClose;
 
@@ -48,6 +50,12 @@ namespace Batbert.Dialogs.ViewModels
             ChooseFilesCommand = new DelegateCommand(ChooseFilesCommandHandler);
             ResetFilesCommand = new DelegateCommand(ResetFilesCommandHanlder);
             CloseCommand = new DelegateCommand<string>(CloseCommandHandler);
+            MergeCommand = new DelegateCommand<object>(MergeCommandHandler);
+        }
+
+        private void MergeCommandHandler(object obj)
+        {
+            _logger.Information("Trying to merge");
         }
 
         public bool CanCloseDialog()
@@ -62,8 +70,8 @@ namespace Batbert.Dialogs.ViewModels
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            buttonName_ = parameters.GetValue<string>("buttonName");
-            FileList = parameters.GetValue<IEnumerable<string>>("fileList").ToList();
+            _buttonName = parameters.GetValue<string>("buttonName");
+            ButtonContentList = parameters.GetValue<IEnumerable<IButtonContent>>("buttonContent").ToList();
         }
 
         public virtual void RaiseRequestClose(IDialogResult dialogResult)
@@ -73,11 +81,11 @@ namespace Batbert.Dialogs.ViewModels
 
         private void CloseCommandHandler(string parameter)
         {
-            var p = new DialogParameters { { "fileList", null } };
+            var p = new DialogParameters { { "buttonContent", null } };
 
             if (parameter.Equals("true"))
             {
-                p = new DialogParameters { { "fileList", FileList } };
+                p = new DialogParameters { { "buttonContent", ButtonContentList } };
                 RaiseRequestClose(new DialogResult(ButtonResult.OK, p));
 
             }
@@ -92,21 +100,39 @@ namespace Batbert.Dialogs.ViewModels
             try
             {
                 _addMp3FilesService.AddFiles();
-                var tmpList = new List<string>();
-                tmpList.AddRange(FileList);
-                tmpList.AddRange(_addMp3FilesService.SelectedFileNames.ToList());
-                FileList = tmpList;
+                var tmpList = new List<IButtonContent>();
+                tmpList.AddRange(ButtonContentList);
+                tmpList.AddRange(ConvertFileListToButtonContet(_addMp3FilesService.SelectedFileNames.ToList()));
+                ButtonContentList = tmpList;
                 ChoosenFolder = _addMp3FilesService.Folder;
             }
             catch (InvalidOperationException e)
             {
-                FileList.Add(e.Message);
+                ButtonContentList.Add(new ButtonContent {
+                    FileName = e.Message, 
+                    Index = 0 
+                }) ;
             }
         }
         private void ResetFilesCommandHanlder()
         {
-            FileList = new List<string>();
+            ButtonContentList = new List<IButtonContent>();
             ChoosenFolder = "";
+        }
+
+        private IEnumerable<IButtonContent> ConvertFileListToButtonContet(IEnumerable<string> fileList)
+        {
+            List<ButtonContent> buttonContent = new();
+            foreach (var file in fileList) {
+                
+                buttonContent.Add(new ButtonContent
+                {
+                    FileName = file,
+                    Index = _index
+                });
+                _index++;
+            }
+            return buttonContent;
         }
     }
 }

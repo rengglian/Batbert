@@ -2,11 +2,9 @@
 using Prism.Mvvm;
 using Batbert.Interfaces;
 using System;
-using System.IO;
 using Batbert.Models;
 using System.Collections.Generic;
 using Prism.Services.Dialogs;
-using System.Linq;
 using Batbert.Extensions;
 
 namespace Batbert.ViewModels
@@ -15,6 +13,7 @@ namespace Batbert.ViewModels
     {
         private readonly IChooseDestinationFolderService _chooseDestinationFolderService;
         private readonly IDialogService _dialogService;
+        private readonly ILogger<MainWindowViewModel> _logger;
 
         private string _title = "BatBert";
         private string _choosenFolder = "";
@@ -42,10 +41,11 @@ namespace Batbert.ViewModels
         public DelegateCommand CloseCommand { get; private set; }
         public Action CloseWindow { get; set; }
 
-        public MainWindowViewModel(IChooseDestinationFolderService chooseDestinationFolderService, IDialogService dialogService)
+        public MainWindowViewModel(IChooseDestinationFolderService chooseDestinationFolderService, IDialogService dialogService, ILogger<MainWindowViewModel> logger)
         {
             _chooseDestinationFolderService = chooseDestinationFolderService;
             _dialogService = dialogService;
+            _logger = logger;
 
             List<BatButton> tmpButtons = new()
             {
@@ -94,6 +94,7 @@ namespace Batbert.ViewModels
 
         private void CloseCommandHandler()
         {
+            _logger.Information("Close Application");
             CloseWindow?.Invoke();
         }
     }

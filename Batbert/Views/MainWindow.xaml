@@ -67,7 +67,7 @@
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
-                                <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource RoundButton}" Content="{Binding FileCount}" Command="{Binding AddFolderCommand}" >
+                                <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource RoundButton}" Content="{Binding ButtonContentCount}" Command="{Binding AddFolderCommand}" >
                                 </Button>
                             </Grid>
                         </GroupBox>
