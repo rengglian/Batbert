@@ -53,13 +53,13 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <ListView Name="ButtonContentListView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding ButtonContentList}" 
+                <ListView Name="ButtonContentListView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding ButtonContentList}"
                       BorderThickness="0"
                       ScrollViewer.VerticalScrollBarVisibility="auto">
                     <ListView.View>
                         <GridView >
                             <GridViewColumn Header="File" DisplayMemberBinding="{Binding FileName}"/>
-                            <GridViewColumn Header="Index" DisplayMemberBinding="{Binding Index}"/>
+                            <GridViewColumn Header="Merged Index" DisplayMemberBinding="{Binding MergedIndex}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>

@@ -1,5 +1,6 @@
 ﻿using Batbert.Interfaces;
 using Batbert.Models;
+using ImTools;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -55,6 +56,28 @@ namespace Batbert.Dialogs.ViewModels
         private void MergeCommandHandler(object obj)
         {
             _logger.Information("Trying to merge");
+
+            var tmpList = new List<IButtonContent>();
+            tmpList.AddRange(ButtonContentList);
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+            var collection = items.Cast<IButtonContent>();
+            int firstIndex = collection.First().MergedIndex;
+            foreach(IButtonContent buttonContent in collection)
+            {
+                tmpList[buttonContent.Index].MergedIndex = firstIndex;
+            }
+            int previousMergedIndex = 0;
+            foreach(IButtonContent buttonContent in tmpList)
+            {
+                if(buttonContent.MergedIndex-previousMergedIndex>1) 
+                {
+                    buttonContent.MergedIndex = previousMergedIndex + 1;
+                }
+                previousMergedIndex = buttonContent.MergedIndex;
+            }
+
+            ButtonContentList = tmpList;
         }
 
         public bool CanCloseDialog()
@@ -71,6 +94,10 @@ namespace Batbert.Dialogs.ViewModels
         {
             _buttonName = parameters.GetValue<string>("buttonName");
             ButtonContentList = parameters.GetValue<IEnumerable<IButtonContent>>("buttonContent").ToList();
+            if(ButtonContentList.Count > 0) 
+            {
+                _index = ButtonContentList.Max(i => i.Index) + 1;
+            }
         }
 
         public virtual void RaiseRequestClose(IDialogResult dialogResult)
@@ -109,7 +136,8 @@ namespace Batbert.Dialogs.ViewModels
             {
                 ButtonContentList.Add(new ButtonContent {
                     FileName = e.Message, 
-                    Index = 0 
+                    Index = 0,
+                    MergedIndex = 0
                 }) ;
             }
         }
@@ -127,7 +155,8 @@ namespace Batbert.Dialogs.ViewModels
                 buttonContent.Add(new ButtonContent
                 {
                     FileName = file,
-                    Index = _index
+                    Index = _index,
+                    MergedIndex = _index
                 });
                 _index++;
             }

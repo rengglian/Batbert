@@ -4,5 +4,6 @@
     {
         string FileName { get; set; }
         int Index { get; set; }
+        int MergedIndex { get; set; }
     }
 }

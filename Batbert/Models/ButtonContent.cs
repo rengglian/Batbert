@@ -6,5 +6,6 @@ namespace Batbert.Models
     {
         public string FileName { get; set; } = string.Empty;
         public int Index { get; set; } = 0;
+        public int MergedIndex { get; set; } = 0;
     }
 }
