@@ -11,6 +11,13 @@ using NLog.Filters;
 using NLog.Targets;
 using NLog;
 using DryIoc;
+using System.IO;
+using System;
+using System.Linq;
+using Prism.Services.Dialogs;
+using Batbert.Extensions;
+using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
 
 namespace Batbert
 {
@@ -20,19 +27,52 @@ namespace Batbert
     public partial class App : PrismApplication
     {
         private ILogger<App> _logger;
-        protected override Window CreateShell()
-            => Container.Resolve<MainWindow>();
+        public static IConfiguration Config { get; private set; }
 
-        protected override void InitializeShell(Window shell)
+        protected override Window CreateShell()
         {
+            LoadAppsettings();
+
             LoggerConfiguration();
 
-            base.InitializeShell(shell);
+            _logger.Information("Start Application");
 
-            if (Current.MainWindow != null)
+            // Stop things from shutting down when the dialog closes
+            Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            var dialogService = Container.Resolve<IDialogService>();
+
+            var ffmpeg_path = Config.GetSection("ffmpeg:ExecPath").Value;
+            var ffmpeg_key = Config.GetSection("ffmpeg").Key;
+            if (!Directory.Exists(ffmpeg_path) || Directory.GetFiles(ffmpeg_path, "ffmpeg.exe", SearchOption.AllDirectories).Length == 0)
             {
-                _logger.Information("Start Application");
+                dialogService.ShowDownLoadFFmpegDialog(r =>
+                {
+                    if (r.Result == ButtonResult.OK)
+                    {
 
+                    }
+                });
+            } else
+            {
+                _logger.Information($"{ffmpeg_key} correct installed");
+            }
+               
+            var mainWindow = Container.Resolve<MainWindow>();
+            mainWindow.Loaded += (_, __) =>
+            {
+                Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+                mainWindow.Activate();
+            };
+            return mainWindow;
+        }
+            
+        protected override void InitializeShell(Window shell)
+        {
+            base.InitializeShell(shell);
+            
+            if (Current.MainWindow != null)
+            { 
                 Current.MainWindow.Show();
             }
         }
@@ -43,13 +83,14 @@ namespace Batbert
 
             containerRegistry.RegisterDialog<ButtonFilesDialogView, ButtonFilesDialogViewModel>();
             containerRegistry.RegisterDialog<ConfirmAndProgressDialogView, ConfirmAndProgressDialogViewModel>();
+            containerRegistry.RegisterDialog<DownLoadFFmpegDialogView, DownLoadFFmpegDialogViewModel>();
 
             containerRegistry.RegisterManySingleton(typeof(NLogService<>), typeof(ILogger<>));
 
             _logger = containerRegistry.GetContainer().Resolve<ILogger<App>>();
         }
 
-        public static void LoggerConfiguration()
+        private static void LoggerConfiguration()
         {
             LoggingConfiguration config = new();
 
@@ -73,6 +114,13 @@ namespace Batbert
             config.LoggingRules.Add(ruleTrace);
 
             LogManager.Configuration = config;
+        }
+
+        private static void LoadAppsettings()
+        {
+            Config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
         }
     }
 }

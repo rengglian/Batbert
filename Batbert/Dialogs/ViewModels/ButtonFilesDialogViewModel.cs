@@ -1,5 +1,4 @@
-﻿
-using Batbert.Interfaces;
+﻿using Batbert.Interfaces;
 using Batbert.Models;
 using Prism.Commands;
 using Prism.Mvvm;

@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="Batbert.Dialogs.Views.DownLoadFFmpegDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Batbert.Dialogs.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             Background="{StaticResource Batbert.Views.Background}"
+             prism:Dialog.WindowStyle="{StaticResource DefaultDialog}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Batbert;component/Resources/GroupBoxStyles.xaml" />
+                <ResourceDictionary Source="/Batbert;component/Resources/ButtonStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Information">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ActualFile}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="File {0} of {1}">
+                            <Binding Path="ActualFileNumber" />
+                            <Binding Path="TotalFiles" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <ProgressBar Grid.Row="1" Grid.Column="0" Value="{Binding ActualFileNumber}" Minimum="0" Maximum="{Binding TotalFiles}"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultGroupBox}" Header="Confirm and Start">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultButton}" Command="{Binding CloseCommand}" CommandParameter="false" Content="Cancel" Width="100" IsDefault="True" />
+                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultButton}" Command="{Binding ConfirmAndStartCommand}" CommandParameter="true" Content="Confirm" Width="100" IsDefault="False" />
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

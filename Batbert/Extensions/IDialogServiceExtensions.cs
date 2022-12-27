@@ -29,5 +29,10 @@ namespace Batbert.Extensions
 
             dialogService.ShowDialog("ConfirmAndProgressDialogView", p, callback);
         }
+
+        public static void ShowDownLoadFFmpegDialog(this IDialogService dialogService, Action<IDialogResult> callback)
+        {
+            dialogService.ShowDialog("DownLoadFFmpegDialogView", callback);
+        }
     }
 }

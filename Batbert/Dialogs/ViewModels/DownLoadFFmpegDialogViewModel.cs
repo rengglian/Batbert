@@ -1,20 +1,23 @@
-﻿using Batbert.Interfaces;
-using Batbert.Models;
+﻿using Batbert.Helper;
+using Batbert.Interfaces;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.IO.Compression;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Batbert.Dialogs.ViewModels
 {
-    public class ConfirmAndProgressDialogViewModel : BindableBase, IDialogAware
+    public class DownLoadFFmpegDialogViewModel : BindableBase, IDialogAware
     {
-        private readonly ILogger<ConfirmAndProgressDialogViewModel> _logger;
-        private List<BatButton> _buttonList = new();
+        private readonly string _ffmpeg_key = App.Config.GetSection("ffmpeg").Key;
+        private readonly string _ffmpeg_path = App.Config.GetSection("ffmpeg:ExecPath").Value;
+        private readonly string _fileUrl = App.Config.GetSection("ffmpeg:DownloadUrl").Value;
+     
+        private readonly ILogger<DownLoadFFmpegDialogViewModel> _logger;
 
         private string _destinationPath = "";
         private string _destinationFile = "";
@@ -56,11 +59,11 @@ namespace Batbert.Dialogs.ViewModels
         public DelegateCommand ConfirmAndStartCommand { get; private set; }
         public DelegateCommand<string> CloseCommand { get; private set; }
 
-        public ConfirmAndProgressDialogViewModel(ILogger<ConfirmAndProgressDialogViewModel> logger)
+        public DownLoadFFmpegDialogViewModel(ILogger<DownLoadFFmpegDialogViewModel> logger)
         {
             _logger = logger;
             ConfirmAndStartCommand = new DelegateCommand(ConfirmAndStartCommandHandler);
-            CloseCommand = new DelegateCommand<string>(CloseCommandHandler);
+            CloseCommand = new DelegateCommand<string>(CloseCommandHandler);          
         }
 
         public bool CanCloseDialog()
@@ -75,9 +78,7 @@ namespace Batbert.Dialogs.ViewModels
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            DestinationPath = parameters.GetValue<string>("destination");
-            _buttonList = parameters.GetValue<IEnumerable<BatButton>>("buttonList").ToList();
-            TotalFiles = _buttonList.Sum(button => button.ButtonContentCount);
+            DestinationPath = AppDomain.CurrentDomain.BaseDirectory + _ffmpeg_key;
         }
 
         public virtual void RaiseRequestClose(IDialogResult dialogResult)
@@ -101,28 +102,35 @@ namespace Batbert.Dialogs.ViewModels
 
         private async void ConfirmAndStartCommandHandler()
         {
-            await Task.Run(() => DoWork());
+            await Task.Run(() => DoDownloadWorkAsync());
+            DoExtractWork();
+        
             CloseCommandHandler("true");
+        
         }
-        private void DoWork()
+
+        private async Task DoDownloadWorkAsync()
         {
-            foreach (BatButton button in _buttonList)
+            if (!Directory.Exists(DestinationPath))
             {
-                int fileNumber = 1;
-                string pathString = Path.Combine(DestinationPath, button.SubFolderName);
-                _logger.Information($"Create Folder {pathString}");
-                //Directory.CreateDirectory(pathString);
-                foreach (IButtonContent buttonContent in button.GetButtonContentList())
-                {
-                    ActualFile = buttonContent.FileName;
-                    string targetFileName = button.SubFolderName.Contains("mp3") ? $"{fileNumber:D4}.mp3" : $"{fileNumber:D3}.mp3";
-                    fileNumber++;
-                    string destFile = Path.Combine(pathString, targetFileName);
-                    _logger.Information($"Copy File {buttonContent.FileName} to {destFile}");
-                    //File.Copy(buttonContent.FileName, destFile, true);
-                    ActualFileNumber++;
-                }
+                _logger.Information($"Create folder for {_ffmpeg_key}");
+                Directory.CreateDirectory(DestinationPath);
             }
+
+            var httpClient = new HttpClient();
+            var httpResult = await httpClient.GetAsync(_fileUrl);
+            using var resultStream = await httpResult.Content.ReadAsStreamAsync();
+            DestinationFile = Path.Combine(DestinationPath, "ffmpeg.zip");
+            using var fileStream = File.Create(DestinationFile);
+            resultStream.CopyTo(fileStream);
+        }
+
+        private void DoExtractWork()
+        {
+            ZipFile.ExtractToDirectory(DestinationFile, DestinationPath, true);
+            File.Delete(DestinationFile);
+            var versionString = CmdHelper.Execute(Path.Combine(_ffmpeg_path, "ffmpeg.exe"), "-version");
+            _logger.Information($"Check Version: {versionString.Substring(0, versionString.IndexOf(Environment.NewLine))}");
         }
     }
 }
