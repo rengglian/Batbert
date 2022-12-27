@@ -103,10 +103,10 @@ namespace Batbert.Dialogs.ViewModels
         private async void ConfirmAndStartCommandHandler()
         {
             await Task.Run(() => DoDownloadWorkAsync());
+         
             DoExtractWork();
         
             CloseCommandHandler("true");
-        
         }
 
         private async Task DoDownloadWorkAsync()
@@ -129,8 +129,7 @@ namespace Batbert.Dialogs.ViewModels
         {
             ZipFile.ExtractToDirectory(DestinationFile, DestinationPath, true);
             File.Delete(DestinationFile);
-            var versionString = CmdHelper.Execute(Path.Combine(_ffmpeg_path, "ffmpeg.exe"), "-version");
-            _logger.Information($"Check Version: {versionString.Substring(0, versionString.IndexOf(Environment.NewLine))}");
+            _logger.Information($"Check Version: {FFmpegWrapper.GetVersion()}");
         }
     }
 }
