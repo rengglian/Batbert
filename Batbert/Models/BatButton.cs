@@ -38,7 +38,7 @@ namespace Batbert.Models
                 if (r.Result == ButtonResult.OK)
                 {
                     ButtonContentList = r.Parameters.GetValue<IEnumerable<IButtonContent>> ("buttonContent").ToList();
-                    ButtonContentCount = ButtonContentList.Count;
+                    ButtonContentCount = ButtonContentList.Max(b => b.MergedIndex);
                 }
             });
         }
