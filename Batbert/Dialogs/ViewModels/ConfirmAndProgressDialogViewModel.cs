@@ -1,4 +1,5 @@
-﻿using Batbert.Interfaces;
+﻿using Batbert.Helper;
+using Batbert.Interfaces;
 using Batbert.Models;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -111,14 +112,19 @@ namespace Batbert.Dialogs.ViewModels
                 int fileNumber = 1;
                 string pathString = Path.Combine(DestinationPath, button.SubFolderName);
                 _logger.Information($"Create Folder {pathString}");
-                //Directory.CreateDirectory(pathString);
-                foreach (IButtonContent buttonContent in button.GetButtonContentList())
+                _ = Directory.CreateDirectory(pathString);
+                var fileList = button.GetButtonContentList();
+                var groupedFileList = fileList.GroupBy(buttons => buttons.MergedIndex).Select(content => content.ToList()).ToList();
+
+                foreach (List<IButtonContent> subList in groupedFileList)
                 {
-                    ActualFile = buttonContent.FileName;
+                    ActualFile = "-i \"" + string.Join("\" -i \"", subList.Select(p => p.FileName)) + "\"";
                     string targetFileName = button.SubFolderName.Contains("mp3") ? $"{fileNumber:D4}.mp3" : $"{fileNumber:D3}.mp3";
                     fileNumber++;
                     string destFile = Path.Combine(pathString, targetFileName);
-                    _logger.Information($"Copy File {buttonContent.FileName} to {destFile}");
+                    _logger.Information($"Copy File [{ActualFile}] to {destFile}");
+                    var testCommand = FFmpegWrapper.CreateMp3(subList.Select(p => p.FileName), destFile);
+                    _logger.Information($"Test Command {testCommand}");
                     //File.Copy(buttonContent.FileName, destFile, true);
                     ActualFileNumber++;
                 }
