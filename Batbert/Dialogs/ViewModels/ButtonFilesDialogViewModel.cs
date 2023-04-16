@@ -1,6 +1,5 @@
 ﻿using Batbert.Interfaces;
 using Batbert.Models;
-using ImTools;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -8,159 +7,158 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Batbert.Dialogs.ViewModels
+namespace Batbert.Dialogs.ViewModels;
+
+public class ButtonFilesDialogViewModel : BindableBase, IDialogAware
 {
-    public class ButtonFilesDialogViewModel : BindableBase, IDialogAware
+    private readonly IAddMp3FilesService _addMp3FilesService;
+    private readonly ILogger<ButtonFilesDialogViewModel> _logger;
+
+    private string _buttonName = "";
+    private List<IButtonContent> _buttonContentList = new();
+    private string _choosenFolder = "";
+
+    private int _index = 0;
+
+    public string Title => $"Button {_buttonName} File List Dialog";
+
+    public List<IButtonContent> ButtonContentList
     {
-        private readonly IAddMp3FilesService _addMp3FilesService;
-        private readonly ILogger<ButtonFilesDialogViewModel> _logger;
+        get => _buttonContentList;
+        set => SetProperty(ref _buttonContentList, value);
+    }
 
-        private string _buttonName = "";
-        private List<IButtonContent> _buttonContentList = new();
-        private string _choosenFolder = "";
+    public string ChoosenFolder
+    {
+        get => _choosenFolder;
+        set => SetProperty(ref _choosenFolder, value);
+    }
 
-        private int _index = 0;
+    public DelegateCommand ChooseFilesCommand { get; private set; }
+    public DelegateCommand ResetFilesCommand { get; private set; }
+    public DelegateCommand<string> CloseCommand { get; private set; }
+    public DelegateCommand<object> MergeCommand { get; private set; }
 
-        public string Title => $"Button {_buttonName} File List Dialog";
+    public event Action<IDialogResult> RequestClose;
 
-        public List<IButtonContent> ButtonContentList
+    public ButtonFilesDialogViewModel(IAddMp3FilesService addMp3FilesService, ILogger<ButtonFilesDialogViewModel> logger)
+    {
+        _addMp3FilesService = addMp3FilesService;
+        _logger = logger;
+
+        ChooseFilesCommand = new DelegateCommand(ChooseFilesCommandHandler);
+        ResetFilesCommand = new DelegateCommand(ResetFilesCommandHanlder);
+        CloseCommand = new DelegateCommand<string>(CloseCommandHandler);
+        MergeCommand = new DelegateCommand<object>(MergeCommandHandler);
+    }
+
+    private void MergeCommandHandler(object obj)
+    {
+        _logger.Information("Trying to merge");
+
+        var tmpList = new List<IButtonContent>();
+        tmpList.AddRange(ButtonContentList);
+
+        System.Collections.IList items = (System.Collections.IList)obj;
+        var collection = items.Cast<IButtonContent>();
+        int firstIndex = collection.First().MergedIndex;
+        foreach(IButtonContent buttonContent in collection)
         {
-            get => _buttonContentList;
-            set => SetProperty(ref _buttonContentList, value);
+            tmpList[buttonContent.Index].MergedIndex = firstIndex;
+        }
+        int previousMergedIndex = 0;
+        foreach(IButtonContent buttonContent in tmpList)
+        {
+            if(buttonContent.MergedIndex-previousMergedIndex>1) 
+            {
+                buttonContent.MergedIndex = previousMergedIndex + 1;
+            }
+            previousMergedIndex = buttonContent.MergedIndex;
         }
 
-        public string ChoosenFolder
+        ButtonContentList = tmpList;
+    }
+
+    public bool CanCloseDialog()
+    {
+        return true;
+    }
+
+    public void OnDialogClosed()
+    {
+
+    }
+
+    public void OnDialogOpened(IDialogParameters parameters)
+    {
+        _buttonName = parameters.GetValue<string>("buttonName");
+        ButtonContentList = parameters.GetValue<IEnumerable<IButtonContent>>("buttonContent").ToList();
+        if(ButtonContentList.Count > 0) 
         {
-            get => _choosenFolder;
-            set => SetProperty(ref _choosenFolder, value);
+            _index = ButtonContentList.Max(i => i.Index) + 1;
         }
+    }
 
-        public DelegateCommand ChooseFilesCommand { get; private set; }
-        public DelegateCommand ResetFilesCommand { get; private set; }
-        public DelegateCommand<string> CloseCommand { get; private set; }
-        public DelegateCommand<object> MergeCommand { get; private set; }
+    public virtual void RaiseRequestClose(IDialogResult dialogResult)
+    {
+        RequestClose?.Invoke(dialogResult);
+    }
 
-        public event Action<IDialogResult> RequestClose;
+    private void CloseCommandHandler(string parameter)
+    {
+        var p = new DialogParameters { { "buttonContent", null } };
 
-        public ButtonFilesDialogViewModel(IAddMp3FilesService addMp3FilesService, ILogger<ButtonFilesDialogViewModel> logger)
+        if (parameter.Equals("true"))
         {
-            _addMp3FilesService = addMp3FilesService;
-            _logger = logger;
+            p = new DialogParameters { { "buttonContent", ButtonContentList } };
+            RaiseRequestClose(new DialogResult(ButtonResult.OK, p));
 
-            ChooseFilesCommand = new DelegateCommand(ChooseFilesCommandHandler);
-            ResetFilesCommand = new DelegateCommand(ResetFilesCommandHanlder);
-            CloseCommand = new DelegateCommand<string>(CloseCommandHandler);
-            MergeCommand = new DelegateCommand<object>(MergeCommandHandler);
         }
-
-        private void MergeCommandHandler(object obj)
+        else
         {
-            _logger.Information("Trying to merge");
+            RaiseRequestClose(new DialogResult(ButtonResult.Cancel, p));
+        }
+    }
 
+    private void ChooseFilesCommandHandler()
+    {
+        try
+        {
+            _addMp3FilesService.AddFiles();
             var tmpList = new List<IButtonContent>();
             tmpList.AddRange(ButtonContentList);
-
-            System.Collections.IList items = (System.Collections.IList)obj;
-            var collection = items.Cast<IButtonContent>();
-            int firstIndex = collection.First().MergedIndex;
-            foreach(IButtonContent buttonContent in collection)
-            {
-                tmpList[buttonContent.Index].MergedIndex = firstIndex;
-            }
-            int previousMergedIndex = 0;
-            foreach(IButtonContent buttonContent in tmpList)
-            {
-                if(buttonContent.MergedIndex-previousMergedIndex>1) 
-                {
-                    buttonContent.MergedIndex = previousMergedIndex + 1;
-                }
-                previousMergedIndex = buttonContent.MergedIndex;
-            }
-
+            tmpList.AddRange(ConvertFileListToButtonContet(_addMp3FilesService.SelectedFileNames.ToList()));
             ButtonContentList = tmpList;
+            ChoosenFolder = _addMp3FilesService.Folder;
         }
-
-        public bool CanCloseDialog()
+        catch (InvalidOperationException e)
         {
-            return true;
+            ButtonContentList.Add(new ButtonContent {
+                FileName = e.Message, 
+                Index = 0,
+                MergedIndex = 0
+            }) ;
         }
+    }
+    private void ResetFilesCommandHanlder()
+    {
+        ButtonContentList = new List<IButtonContent>();
+        ChoosenFolder = "";
+    }
 
-        public void OnDialogClosed()
-        {
-
-        }
-
-        public void OnDialogOpened(IDialogParameters parameters)
-        {
-            _buttonName = parameters.GetValue<string>("buttonName");
-            ButtonContentList = parameters.GetValue<IEnumerable<IButtonContent>>("buttonContent").ToList();
-            if(ButtonContentList.Count > 0) 
+    private IEnumerable<IButtonContent> ConvertFileListToButtonContet(IEnumerable<string> fileList)
+    {
+        List<ButtonContent> buttonContent = new();
+        foreach (var file in fileList) {
+            
+            buttonContent.Add(new ButtonContent
             {
-                _index = ButtonContentList.Max(i => i.Index) + 1;
-            }
+                FileName = file,
+                Index = _index,
+                MergedIndex = _index
+            });
+            _index++;
         }
-
-        public virtual void RaiseRequestClose(IDialogResult dialogResult)
-        {
-            RequestClose?.Invoke(dialogResult);
-        }
-
-        private void CloseCommandHandler(string parameter)
-        {
-            var p = new DialogParameters { { "buttonContent", null } };
-
-            if (parameter.Equals("true"))
-            {
-                p = new DialogParameters { { "buttonContent", ButtonContentList } };
-                RaiseRequestClose(new DialogResult(ButtonResult.OK, p));
-
-            }
-            else
-            {
-                RaiseRequestClose(new DialogResult(ButtonResult.Cancel, p));
-            }
-        }
-
-        private void ChooseFilesCommandHandler()
-        {
-            try
-            {
-                _addMp3FilesService.AddFiles();
-                var tmpList = new List<IButtonContent>();
-                tmpList.AddRange(ButtonContentList);
-                tmpList.AddRange(ConvertFileListToButtonContet(_addMp3FilesService.SelectedFileNames.ToList()));
-                ButtonContentList = tmpList;
-                ChoosenFolder = _addMp3FilesService.Folder;
-            }
-            catch (InvalidOperationException e)
-            {
-                ButtonContentList.Add(new ButtonContent {
-                    FileName = e.Message, 
-                    Index = 0,
-                    MergedIndex = 0
-                }) ;
-            }
-        }
-        private void ResetFilesCommandHanlder()
-        {
-            ButtonContentList = new List<IButtonContent>();
-            ChoosenFolder = "";
-        }
-
-        private IEnumerable<IButtonContent> ConvertFileListToButtonContet(IEnumerable<string> fileList)
-        {
-            List<ButtonContent> buttonContent = new();
-            foreach (var file in fileList) {
-                
-                buttonContent.Add(new ButtonContent
-                {
-                    FileName = file,
-                    Index = _index,
-                    MergedIndex = _index
-                });
-                _index++;
-            }
-            return buttonContent;
-        }
+        return buttonContent;
     }
 }

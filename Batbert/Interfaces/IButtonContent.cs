@@ -1,9 +1,8 @@
-﻿namespace Batbert.Interfaces
+﻿namespace Batbert.Interfaces;
+
+public interface IButtonContent
 {
-    public interface IButtonContent
-    {
-        string FileName { get; set; }
-        int Index { get; set; }
-        int MergedIndex { get; set; }
-    }
+    string FileName { get; set; }
+    int Index { get; set; }
+    int MergedIndex { get; set; }
 }

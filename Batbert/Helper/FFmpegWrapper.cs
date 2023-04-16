@@ -19,7 +19,7 @@ namespace Batbert.Helper
             var inputFilesArg = "-i \"" + string.Join("\" -i \"", inputFiles) + "\"";
             var outputFileArg = $"-filter_complex concat=n={inputFiles.Count()}:v=0:a=1 -c:a mp3 -vn {outputFile}";
             var ffmpeg_path = App.Config.GetSection("ffmpeg:ExecPath").Value;
-            var versionString = CmdHelper.Execute(Path.Combine(ffmpeg_path, "ffmpeg.exe"), $"{inputFilesArg} {outputFileArg}");
+            _ = CmdHelper.Execute(Path.Combine(ffmpeg_path, "ffmpeg.exe"), $"{inputFilesArg} {outputFileArg}");
             return $"{Path.Combine(ffmpeg_path, "ffmpeg.exe")} {inputFilesArg} {outputFileArg}";
         }
     }
